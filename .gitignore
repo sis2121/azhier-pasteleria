@@ -1,0 +1,23 @@
+# Entorno virtual de Python
+backend/venv/
+
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+
+# Configuración con credenciales (opcional, si decides ocultarla)
+# backend/config.py   # Descomenta esta línea si quieres ignorar el config real y subir un ejemplo
+
+# Dependencias de Node
+frontend/node_modules/
+
+# Archivos de entorno
+.env
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de subida (imágenes que se suben al servidor)
+backend/static/uploads/*
+!backend/static/uploads/.gitkeep
