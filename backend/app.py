@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from config import Config
-from modelos import db
+from modelos import db, Administrador
 import os
 
 app = Flask(__name__)
@@ -17,9 +17,16 @@ db.init_app(app)
 # Asegurar carpeta de uploads
 os.makedirs(app.config['CARPETA_SUBIDAS'], exist_ok=True)
 
-# Inicializar la base de datos dentro del contexto de la aplicación
+# Inicializar la base de datos y crear el admin por defecto
 with app.app_context():
     db.create_all()
+    # Si no existe el usuario 'admin', lo crea
+    if not Administrador.query.filter_by(usuario='admin').first():
+        hash_con = bcrypt.generate_password_hash('admin123').decode('utf-8')
+        admin = Administrador(usuario='admin', hash_contrasena=hash_con)
+        db.session.add(admin)
+        db.session.commit()
+        print("Administrador creado automáticamente (admin / admin123)")
 
 # Registrar blueprints
 from rutas.autenticacion import auth_bp
