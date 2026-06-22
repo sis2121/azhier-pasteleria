@@ -1,4 +1,4 @@
-const URL_BASE = "http://localhost:5000/api";
+const URL_BASE = 'https://azhier-pasteleria.onrender.com/api';
 
 const obtenerToken = () => localStorage.getItem("tokenAdmin");
 
