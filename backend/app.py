@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from config import Config
-from modelos import db, Administrador
+from modelos import db, Administrador, Categoria
 import os
 
 app = Flask(__name__)
@@ -17,10 +17,18 @@ db.init_app(app)
 # Asegurar carpeta de uploads
 os.makedirs(app.config['CARPETA_SUBIDAS'], exist_ok=True)
 
-# Inicializar la base de datos y crear el admin por defecto
+# Inicializar la base de datos, crear admin e insertar categorías iniciales
 with app.app_context():
     db.create_all()
-    # Si no existe el usuario 'admin', lo crea
+
+    # Insertar categorías iniciales si no existen
+    categorias_iniciales = ['Pasteles', 'Postres']
+    for nombre_cat in categorias_iniciales:
+        if not Categoria.query.filter_by(nombre=nombre_cat).first():
+            db.session.add(Categoria(nombre=nombre_cat))
+    db.session.commit()
+
+    # Crear admin por defecto si no existe
     if not Administrador.query.filter_by(usuario='admin').first():
         hash_con = bcrypt.generate_password_hash('admin123').decode('utf-8')
         admin = Administrador(usuario='admin', hash_contrasena=hash_con)
