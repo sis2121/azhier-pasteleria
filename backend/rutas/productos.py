@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from utilidades import admin_requerido, subir_imagen_a_cloudinary
-from modelos import db, Producto, Presentacion, Categoria
+from modelos import db, Producto, Presentacion, ItemPedido
 import json
 
 productos_bp = Blueprint('admin_productos', __name__)
@@ -114,6 +114,11 @@ def actualizar_producto(id):
 @admin_requerido
 def eliminar_producto(id):
     producto = Producto.query.get_or_404(id)
+
+    # Eliminar referencias de pedidos antes de borrar el producto/presentaciones
+    ItemPedido.query.filter_by(producto_id=producto.id).delete(synchronize_session=False)
+    Presentacion.query.filter_by(producto_id=producto.id).delete(synchronize_session=False)
+
     db.session.delete(producto)
     db.session.commit()
     return jsonify(mensaje='Producto eliminado')
