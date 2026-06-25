@@ -101,7 +101,11 @@ const AdminProductos = () => {
                         <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
                           {p.imagen ? (
                             <img
-                              src={`http://localhost:5000/static/uploads/${p.imagen}`}
+                              src={
+                                p.imagen.startsWith("http")
+                                  ? p.imagen
+                                  : `http://localhost:5000/static/uploads/${p.imagen}`
+                              }
                               alt={p.nombre}
                               className="w-full h-full object-cover"
                               onError={(e) => (e.target.style.display = "none")}

@@ -2,12 +2,23 @@ from flask import Flask
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
 from config import Config
 from modelos import db, Administrador, Categoria
+import cloudinary
 import os
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+cloudinary.config(
+    cloud_name=app.config.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=app.config.get('CLOUDINARY_API_KEY'),
+    api_secret=app.config.get('CLOUDINARY_API_SECRET'),
+    secure=True,
+)
 
 CORS(app)
 bcrypt = Bcrypt(app)

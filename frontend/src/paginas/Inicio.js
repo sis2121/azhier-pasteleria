@@ -128,7 +128,9 @@ const Inicio = () => {
                 <img
                   src={
                     p.imagen
-                      ? `http://localhost:5000/static/uploads/${p.imagen}`
+                      ? p.imagen.startsWith("http")
+                        ? p.imagen
+                        : `http://localhost:5000/static/uploads/${p.imagen}`
                       : "/placeholder.jpg"
                   }
                   alt={p.nombre}

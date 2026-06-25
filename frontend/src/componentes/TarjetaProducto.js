@@ -2,6 +2,12 @@ import React, { useContext } from "react";
 import { ContextoCarrito } from "./ContextoCarrito";
 import { Plus, Edit, ShoppingBag, Percent } from "lucide-react";
 
+const obtenerUrlImagen = (imagen) => {
+  if (!imagen) return "/placeholder.jpg";
+  if (imagen.startsWith("http")) return imagen;
+  return `http://localhost:5000/static/uploads/${imagen}`;
+};
+
 const TarjetaProducto = ({ producto }) => {
   const { carrito, agregarAlCarrito, actualizarItem, eliminarItem } =
     useContext(ContextoCarrito);
@@ -41,11 +47,7 @@ const TarjetaProducto = ({ producto }) => {
       {/* Imagen */}
       <div className="relative overflow-hidden">
         <img
-          src={
-            producto.imagen
-              ? `http://localhost:5000/static/uploads/${producto.imagen}`
-              : "/placeholder.jpg"
-          }
+          src={obtenerUrlImagen(producto.imagen)}
           alt={producto.nombre}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
         />

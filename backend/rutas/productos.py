@@ -1,13 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app
-from utilidades import admin_requerido
+from utilidades import admin_requerido, subir_imagen_a_cloudinary
 from modelos import db, Producto, Presentacion, Categoria
-from werkzeug.utils import secure_filename
-import os, json
+import json
 
 productos_bp = Blueprint('admin_productos', __name__)
-
-def carpeta_subidas():
-    return current_app.config['CARPETA_SUBIDAS']
 
 @productos_bp.route('/productos', methods=['GET'])
 @admin_requerido
@@ -47,11 +43,9 @@ def crear_producto():
         return jsonify(mensaje='Campos obligatorios: nombre, categoria_id, precio_porcion'), 400
 
     archivo_imagen = request.files.get('imagen')
-    nombre_imagen = None
+    url_imagen = None
     if archivo_imagen and archivo_imagen.filename:
-        nombre_archivo = secure_filename(archivo_imagen.filename)
-        archivo_imagen.save(os.path.join(carpeta_subidas(), nombre_archivo))
-        nombre_imagen = nombre_archivo
+        url_imagen = subir_imagen_a_cloudinary(archivo_imagen)
 
     precio_porcion_float = float(precio_porcion)
 
@@ -59,7 +53,7 @@ def crear_producto():
         categoria_id=int(categoria_id),
         nombre=nombre,
         descripcion=descripcion,
-        imagen=nombre_imagen,
+        imagen=url_imagen,
         precio_porcion=precio_porcion_float,
         es_destacado=es_destacado
     )
@@ -94,9 +88,9 @@ def actualizar_producto(id):
 
     archivo_imagen = request.files.get('imagen')
     if archivo_imagen and archivo_imagen.filename:
-        nombre_archivo = secure_filename(archivo_imagen.filename)
-        archivo_imagen.save(os.path.join(carpeta_subidas(), nombre_archivo))
-        producto.imagen = nombre_archivo
+        url_imagen = subir_imagen_a_cloudinary(archivo_imagen)
+        if url_imagen:
+            producto.imagen = url_imagen
 
     presentaciones_json = request.form.get('presentaciones')
     if presentaciones_json is not None:
