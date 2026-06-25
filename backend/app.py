@@ -13,10 +13,14 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 app = Flask(__name__)
 app.config.from_object(Config)
 
+cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME') or app.config.get('CLOUDINARY_CLOUD_NAME')
+api_key = os.getenv('CLOUDINARY_API_KEY') or app.config.get('CLOUDINARY_API_KEY')
+api_secret = os.getenv('CLOUDINARY_API_SECRET') or app.config.get('CLOUDINARY_API_SECRET')
+
 cloudinary.config(
-    cloud_name=app.config.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=app.config.get('CLOUDINARY_API_KEY'),
-    api_secret=app.config.get('CLOUDINARY_API_SECRET'),
+    cloud_name=cloud_name,
+    api_key=api_key,
+    api_secret=api_secret,
     secure=True,
 )
 
