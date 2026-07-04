@@ -70,9 +70,6 @@ const AdminProductos = () => {
             <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4 font-medium">Producto</th>
-                <th className="px-6 py-4 font-medium hidden md:table-cell">
-                  Categoría
-                </th>
                 <th className="px-6 py-4 font-medium">Precio</th>
                 <th className="px-6 py-4 font-medium hidden sm:table-cell">
                   Destacado
