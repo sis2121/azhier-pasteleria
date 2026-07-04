@@ -49,6 +49,15 @@ with app.app_context():
                 with db.engine.begin() as conn:
                     conn.execute(text('ALTER TABLE productos DROP COLUMN IF EXISTS categoria_id'))
 
+        if 'productos' in tablas:
+            with db.engine.begin() as conn:
+                columnas_restantes = conn.execute(
+                    text("SELECT column_name FROM information_schema.columns WHERE table_name = 'productos'")
+                ).fetchall()
+                columnas_restantes = {col[0] for col in columnas_restantes}
+                if 'categoria_id' in columnas_restantes:
+                    raise RuntimeError('La columna categoria_id sigue presente en productos tras la migración.')
+
     migrar_esquema()
     db.create_all()
 
