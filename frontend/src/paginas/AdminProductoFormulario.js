@@ -329,18 +329,6 @@ const AdminProductoFormulario = () => {
             >
               Cancelar
             </button>
-
-            <div className="mt-6 pt-4 border-t border-gray-100">
-              <p className="text-sm text-gray-500">Vista previa básica</p>
-              <div className="mt-2 text-sm">
-                <p className="font-medium truncate">
-                  {nombre || "Nombre del producto"}
-                </p>
-                <p className="text-pink-600 font-bold">
-                  Bs. {precio || "0.00"} / porción
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </form>

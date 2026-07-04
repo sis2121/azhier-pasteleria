@@ -58,7 +58,13 @@ const TarjetaProducto = ({ producto }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
+    <div
+      className={`rounded-2xl border overflow-hidden transition-all duration-300 group flex flex-col ${
+        carrito.some((item) => item.producto_id === producto.id)
+          ? "bg-pink-50 border-pink-200 shadow-md ring-1 ring-pink-100"
+          : "bg-white border-gray-100 shadow-sm hover:shadow-lg"
+      }`}
+    >
       {/* Imagen */}
       <div className="relative overflow-hidden">
         <img
