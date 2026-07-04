@@ -91,6 +91,60 @@ def analitica():
             })
     
     aristas = [{'origen': u, 'destino': v, 'peso': d['peso']} for u, v, d in B.edges(data=True)]
+
+    # Grafo clientes con más de un producto
+    G_variedad = nx.Graph()
+    for pedido in pedidos:
+        productos_unicos = {item.producto_id for item in pedido.items}
+        if len(productos_unicos) <= 1:
+            continue
+
+        nodo_cliente = f"c_{pedido.telefono}"
+        G_variedad.add_node(nodo_cliente, bipartite=0)
+        for producto_id in productos_unicos:
+            nodo_producto = f"p_{producto_id}"
+            G_variedad.add_node(nodo_producto, bipartite=1)
+            if G_variedad.has_edge(nodo_cliente, nodo_producto):
+                G_variedad[nodo_cliente][nodo_producto]['peso'] += 1
+            else:
+                G_variedad.add_edge(nodo_cliente, nodo_producto, peso=1)
+
+    nodos_variedad = []
+    for nodo in G_variedad.nodes():
+        if nodo.startswith('c_'):
+            telefono = nodo[2:]
+            nombre_legible = nombres_clientes.get(telefono, telefono)
+            nodos_variedad.append({'id': nodo, 'etiqueta': nombre_legible, 'tipo': 'cliente'})
+        else:
+            producto_id = int(nodo[2:])
+            nombre_legible = nombres_productos.get(producto_id, f"Producto {producto_id}")
+            nodos_variedad.append({'id': nodo, 'etiqueta': nombre_legible, 'tipo': 'producto'})
+
+    aristas_variedad = [{'origen': u, 'destino': v, 'peso': d['peso']} for u, v, d in G_variedad.edges(data=True)]
+
+    # Grafo clientes ↔ métodos de pago
+    G_pagos = nx.Graph()
+    for pedido in pedidos:
+        nodo_cliente = f"c_{pedido.telefono}"
+        nodo_pago = f"m_{pedido.metodo_pago or 'Sin dato'}"
+        G_pagos.add_node(nodo_cliente, bipartite=0)
+        G_pagos.add_node(nodo_pago, bipartite=1)
+        if G_pagos.has_edge(nodo_cliente, nodo_pago):
+            G_pagos[nodo_cliente][nodo_pago]['peso'] += 1
+        else:
+            G_pagos.add_edge(nodo_cliente, nodo_pago, peso=1)
+
+    nodos_pagos = []
+    for nodo in G_pagos.nodes():
+        if nodo.startswith('c_'):
+            telefono = nodo[2:]
+            nombre_legible = nombres_clientes.get(telefono, telefono)
+            nodos_pagos.append({'id': nodo, 'etiqueta': nombre_legible, 'tipo': 'cliente'})
+        else:
+            metodo = nodo[2:]
+            nodos_pagos.append({'id': nodo, 'etiqueta': metodo, 'tipo': 'metodo_pago'})
+
+    aristas_pagos = [{'origen': u, 'destino': v, 'peso': d['peso']} for u, v, d in G_pagos.edges(data=True)]
     
     ventas_totales = sum(float(p.monto_total) for p in pedidos if p.estado != 'Cancelado')
     pendientes = Pedido.query.filter_by(estado='Pendiente').count()
@@ -105,5 +159,13 @@ def analitica():
         'grafo_bipartito': {
             'nodos': nodos,
             'aristas': aristas
+        },
+        'grafo_clientes_multi_producto': {
+            'nodos': nodos_variedad,
+            'aristas': aristas_variedad
+        },
+        'grafo_clientes_metodos_pago': {
+            'nodos': nodos_pagos,
+            'aristas': aristas_pagos
         }
     })

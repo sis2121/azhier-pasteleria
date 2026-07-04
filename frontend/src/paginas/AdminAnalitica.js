@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { apiAdmin } from "../servicios/api";
 
-const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
+const GraficoGrafoEstatico = ({
+  grafo,
+  nodoResaltadoId = null,
+  tipoIzquierda = "producto",
+  tituloIzquierda = "Productos",
+  tipoDerecha = "cliente",
+  tituloDerecha = "Clientes",
+}) => {
   const nodos = grafo?.nodos ?? [];
   const aristas = grafo?.aristas ?? [];
 
@@ -24,11 +31,11 @@ const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
       )
     : aristas;
 
-  const productos = nodosFiltrados.filter((n) => n.tipo === "producto");
-  const clientes = nodosFiltrados.filter((n) => n.tipo === "cliente");
+  const izquierda = nodosFiltrados.filter((n) => n.tipo === tipoIzquierda);
+  const derecha = nodosFiltrados.filter((n) => n.tipo === tipoDerecha);
   const altura = Math.max(
     360,
-    90 + Math.max(productos.length, clientes.length) * 44,
+    90 + Math.max(izquierda.length, derecha.length) * 44,
   );
 
   const posiciones = {};
@@ -39,12 +46,12 @@ const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
     return margen + (index * espacio) / (total - 1);
   };
 
-  productos.forEach((nodo, index) => {
-    posiciones[nodo.id] = { x: 140, y: calcularY(index, productos.length) };
+  izquierda.forEach((nodo, index) => {
+    posiciones[nodo.id] = { x: 140, y: calcularY(index, izquierda.length) };
   });
 
-  clientes.forEach((nodo, index) => {
-    posiciones[nodo.id] = { x: 620, y: calcularY(index, clientes.length) };
+  derecha.forEach((nodo, index) => {
+    posiciones[nodo.id] = { x: 620, y: calcularY(index, derecha.length) };
   });
 
   return (
@@ -80,7 +87,7 @@ const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
           fontSize="13"
           fontWeight="700"
         >
-          Productos
+          {tituloIzquierda}
         </text>
         <text
           x="620"
@@ -90,7 +97,7 @@ const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
           fontSize="13"
           fontWeight="700"
         >
-          Clientes
+          {tituloDerecha}
         </text>
 
         {aristasFiltradas.map((arista) => {
@@ -128,7 +135,9 @@ const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
                     ? "#be185d"
                     : nodo.tipo === "cliente"
                       ? "#2563eb"
-                      : "#ec4899"
+                      : nodo.tipo === "metodo_pago"
+                        ? "#0f766e"
+                        : "#ec4899"
                 }
                 stroke="#ffffff"
                 strokeWidth="3"
@@ -144,12 +153,16 @@ const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
                 {nodo.etiqueta.slice(0, 2).toUpperCase()}
               </text>
               <text
-                x={nodo.tipo === "producto" ? posicion.x - 34 : posicion.x + 32}
+                x={
+                  nodo.tipo === tipoIzquierda
+                    ? posicion.x - 34
+                    : posicion.x + 32
+                }
                 y={posicion.y - 8}
                 fill="#111827"
                 fontSize="11"
                 fontWeight="600"
-                textAnchor={nodo.tipo === "producto" ? "end" : "start"}
+                textAnchor={nodo.tipo === tipoIzquierda ? "end" : "start"}
               >
                 {nodo.etiqueta}
               </text>
@@ -224,6 +237,39 @@ const AdminAnalitica = () => {
         <GraficoGrafoEstatico
           grafo={datos.grafo_bipartito}
           nodoResaltadoId={productoMasConectado?.id}
+        />
+      </div>
+
+      <div className="bg-white p-5 rounded-xl shadow-sm border">
+        <h3 className="font-semibold text-lg mb-3">
+          Clientes que compran más de un producto
+        </h3>
+        <p className="text-sm text-gray-500 mb-3">
+          Muestra a los clientes que tienen varias compras de productos
+          diferentes.
+        </p>
+        <GraficoGrafoEstatico
+          grafo={datos.grafo_clientes_multi_producto}
+          tipoIzquierda="producto"
+          tituloIzquierda="Productos"
+          tipoDerecha="cliente"
+          tituloDerecha="Clientes"
+        />
+      </div>
+
+      <div className="bg-white p-5 rounded-xl shadow-sm border">
+        <h3 className="font-semibold text-lg mb-3">
+          Relación cliente ↔ método de pago
+        </h3>
+        <p className="text-sm text-gray-500 mb-3">
+          Conexiones entre clientes y los métodos de pago que han utilizado.
+        </p>
+        <GraficoGrafoEstatico
+          grafo={datos.grafo_clientes_metodos_pago}
+          tipoIzquierda="metodo_pago"
+          tituloIzquierda="Métodos de pago"
+          tipoDerecha="cliente"
+          tituloDerecha="Clientes"
         />
       </div>
     </div>
