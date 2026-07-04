@@ -94,9 +94,9 @@ const GraficoGrafoEstatico = ({ grafo }) => {
               y1={origen.y}
               x2={destino.x}
               y2={destino.y}
-              stroke="#d1d5db"
-              strokeWidth={Math.max(1.2, arista.peso * 0.6)}
-              strokeOpacity="0.7"
+              stroke="#6b7280"
+              strokeWidth={Math.max(2.2, arista.peso * 0.8)}
+              strokeOpacity="0.95"
             />
           );
         })}
@@ -110,8 +110,8 @@ const GraficoGrafoEstatico = ({ grafo }) => {
               <circle
                 cx={posicion.x}
                 cy={posicion.y}
-                r="20"
-                fill={nodo.tipo === "cliente" ? "#3b82f6" : "#ec4899"}
+                r="22"
+                fill={nodo.tipo === "cliente" ? "#2563eb" : "#ec4899"}
                 stroke="#ffffff"
                 strokeWidth="3"
               />
@@ -124,6 +124,15 @@ const GraficoGrafoEstatico = ({ grafo }) => {
                 fontWeight="700"
               >
                 {nodo.etiqueta.slice(0, 2).toUpperCase()}
+              </text>
+              <text
+                x={posicion.x + 32}
+                y={posicion.y - 8}
+                fill="#111827"
+                fontSize="11"
+                fontWeight="600"
+              >
+                {nodo.etiqueta}
               </text>
             </g>
           );
@@ -209,9 +218,9 @@ const AdminAnalitica = () => {
               <Tooltip />
               <Bar
                 dataKey="cantidad"
-                fill="#f43f5e"
-                radius={[0, 6, 6, 0]}
-                barSize={18}
+                fill="#ef4444"
+                radius={[0, 8, 8, 0]}
+                barSize={20}
               />
             </BarChart>
           </ResponsiveContainer>
