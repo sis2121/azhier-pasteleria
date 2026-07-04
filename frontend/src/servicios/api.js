@@ -1,4 +1,4 @@
-const URL_BASE = 'https://azhier-pasteleria.onrender.com/api';
+const URL_BASE = "https://azhier-pasteleria.onrender.com/api";
 
 const obtenerToken = () => localStorage.getItem("tokenAdmin");
 
@@ -12,13 +12,8 @@ const cabeceras = (autenticado = false) => {
 };
 
 export const apiPublica = {
-  obtenerCategorias: () =>
-    fetch(`${URL_BASE}/categorias`).then((res) => res.json()),
-  obtenerProductos: (categoria) => {
-    let url = `${URL_BASE}/productos`;
-    if (categoria) url += `?categoria=${categoria}`;
-    return fetch(url).then((res) => res.json());
-  },
+  obtenerProductos: () =>
+    fetch(`${URL_BASE}/productos`).then((res) => res.json()),
   obtenerDestacados: () =>
     fetch(`${URL_BASE}/productos/destacados`).then((res) => res.json()),
   crearPedido: (datos) =>

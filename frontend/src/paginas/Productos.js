@@ -5,17 +5,11 @@ import { Search, Package } from "lucide-react";
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [catSeleccionada, setCatSeleccionada] = useState("");
   const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
-    apiPublica.obtenerCategorias().then(setCategorias);
+    apiPublica.obtenerProductos().then(setProductos);
   }, []);
-
-  useEffect(() => {
-    apiPublica.obtenerProductos(catSeleccionada).then(setProductos);
-  }, [catSeleccionada]);
 
   const productosFiltrados = productos.filter((p) =>
     p.nombre.toLowerCase().includes(busqueda.toLowerCase()),
@@ -39,33 +33,10 @@ const Productos = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        {/* Buscador y filtros */}
+        {/* Buscador */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          {/* Filtros de categoría */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setCatSeleccionada("")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                !catSeleccionada
-                  ? "bg-pink-500 text-white shadow-md"
-                  : "bg-white text-gray-600 hover:bg-pink-50 border border-gray-200"
-              }`}
-            >
-              Todos
-            </button>
-            {categorias.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setCatSeleccionada(cat.id)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                  catSeleccionada == cat.id
-                    ? "bg-pink-500 text-white shadow-md"
-                    : "bg-white text-gray-600 hover:bg-pink-50 border border-gray-200"
-                }`}
-              >
-                {cat.nombre}
-              </button>
-            ))}
+          <div className="text-sm text-gray-500">
+            Todos nuestros productos en un solo listado.
           </div>
 
           {/* Búsqueda */}

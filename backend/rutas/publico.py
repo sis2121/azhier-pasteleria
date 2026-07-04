@@ -1,27 +1,16 @@
 from flask import Blueprint, request, jsonify
-from modelos import db, Categoria, Producto, Presentacion, Pedido, ItemPedido
+from modelos import db, Producto, Presentacion, Pedido, ItemPedido
 import datetime
 
 publico_bp = Blueprint('publico', __name__)
 
-@publico_bp.route('/categorias', methods=['GET'])
-def obtener_categorias():
-    cats = Categoria.query.all()
-    return jsonify([{'id': c.id, 'nombre': c.nombre} for c in cats])
-
 @publico_bp.route('/productos', methods=['GET'])
 def obtener_productos():
-    categoria_id = request.args.get('categoria')
-    consulta = Producto.query
-    if categoria_id:
-        consulta = consulta.filter_by(categoria_id=categoria_id)
-    productos = consulta.all()
+    productos = Producto.query.all()
     resultado = []
     for p in productos:
         resultado.append({
             'id': p.id,
-            'categoria_id': p.categoria_id,
-            'categoria': p.categoria.nombre,
             'nombre': p.nombre,
             'descripcion': p.descripcion,
             'imagen': p.imagen,

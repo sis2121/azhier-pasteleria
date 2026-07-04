@@ -84,7 +84,7 @@ const AdminProductos = () => {
               {productosFiltrados.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="4"
                     className="px-6 py-12 text-center text-gray-400"
                   >
                     No se encontraron productos
@@ -120,16 +120,8 @@ const AdminProductos = () => {
                           <p className="font-medium text-gray-800">
                             {p.nombre}
                           </p>
-                          <p className="text-xs text-gray-400 line-clamp-1 md:hidden">
-                            {p.categoria_id}
-                          </p>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                        {p.categoria_id}
-                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-medium text-gray-800">

@@ -13,7 +13,6 @@ def obtener_todos():
     for p in productos:
         resultado.append({
             'id': p.id,
-            'categoria_id': p.categoria_id,
             'nombre': p.nombre,
             'descripcion': p.descripcion,
             'imagen': p.imagen,
@@ -33,14 +32,13 @@ def obtener_todos():
 def crear_producto():
     datos = request.form
     nombre = datos.get('nombre')
-    categoria_id = datos.get('categoria_id')
     descripcion = datos.get('descripcion', '')
     precio_porcion = datos.get('precio_porcion')
     es_destacado = datos.get('es_destacado', 'false').lower() == 'true'
     presentaciones_json = request.form.get('presentaciones')  # JSON string
 
-    if not nombre or not categoria_id or not precio_porcion:
-        return jsonify(mensaje='Campos obligatorios: nombre, categoria_id, precio_porcion'), 400
+    if not nombre or not precio_porcion:
+        return jsonify(mensaje='Campos obligatorios: nombre, precio_porcion'), 400
 
     archivo_imagen = request.files.get('imagen')
     url_imagen = None
@@ -50,7 +48,6 @@ def crear_producto():
     precio_porcion_float = float(precio_porcion)
 
     producto = Producto(
-        categoria_id=int(categoria_id),
         nombre=nombre,
         descripcion=descripcion,
         imagen=url_imagen,
@@ -81,7 +78,6 @@ def actualizar_producto(id):
     producto = Producto.query.get_or_404(id)
     datos = request.form
     producto.nombre = datos.get('nombre', producto.nombre)
-    producto.categoria_id = int(datos.get('categoria_id', producto.categoria_id))
     producto.descripcion = datos.get('descripcion', producto.descripcion)
     producto.precio_porcion = float(datos.get('precio_porcion', producto.precio_porcion))
     producto.es_destacado = datos.get('es_destacado', str(producto.es_destacado)).lower() == 'true'

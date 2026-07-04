@@ -1,13 +1,5 @@
-CREATE TABLE categorias (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE
-);
-
-INSERT INTO categorias (nombre) VALUES ('Pasteles'), ('Postres');
-
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
-    categoria_id INTEGER REFERENCES categorias(id),
     nombre VARCHAR(200) NOT NULL,
     descripcion TEXT,
     imagen VARCHAR(300),

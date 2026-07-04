@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { apiAdmin, apiPublica } from "../servicios/api";
+import { apiAdmin } from "../servicios/api";
 import {
   Plus,
   Trash,
@@ -17,9 +17,7 @@ const AdminProductoFormulario = () => {
   const { id } = useParams();
   const navegar = useNavigate();
   const esEditar = Boolean(id);
-  const [categorias, setCategorias] = useState([]);
   const [nombre, setNombre] = useState("");
-  const [categoria, setCategoria] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
   const [destacado, setDestacado] = useState(false);
@@ -31,13 +29,11 @@ const AdminProductoFormulario = () => {
   const [imagenPreview, setImagenPreview] = useState(null);
 
   useEffect(() => {
-    apiPublica.obtenerCategorias().then(setCategorias);
     if (esEditar) {
       apiAdmin.obtenerProductos().then((prods) => {
         const p = prods.find((x) => x.id == id);
         if (p) {
           setNombre(p.nombre);
-          setCategoria(p.categoria_id);
           setDescripcion(p.descripcion || "");
           setPrecio(p.precio_porcion);
           setDestacado(p.es_destacado);
@@ -90,7 +86,6 @@ const AdminProductoFormulario = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("nombre", nombre);
-    formData.append("categoria_id", categoria);
     formData.append("descripcion", descripcion);
     formData.append("precio_porcion", precio);
     formData.append("es_destacado", destacado);
@@ -154,25 +149,7 @@ const AdminProductoFormulario = () => {
                   required
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Categoría
-                  </label>
-                  <select
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all bg-white"
-                    value={categoria}
-                    onChange={(e) => setCategoria(e.target.value)}
-                    required
-                  >
-                    <option value="">Seleccionar categoría</option>
-                    {categorias.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Precio por porción (Bs)
