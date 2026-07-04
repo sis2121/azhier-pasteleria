@@ -14,7 +14,17 @@ export const ProveedorCarrito = ({ children }) => {
   }, [carrito]);
 
   const agregarAlCarrito = (item) => {
-    const nuevoItem = { ...item, idCarrito: Date.now() };
+    const nuevoItem = {
+      ...item,
+      idCarrito: Date.now(),
+      precio: Number(item.precio || 0),
+      precio_original: Number(
+        item.precio_original ??
+          (item.descuento
+            ? item.precio / (1 - item.descuento / 100)
+            : item.precio || 0),
+      ),
+    };
     setCarrito((prev) => [...prev, nuevoItem]);
     toast.success(`${item.nombre} agregado al carrito`, {
       duration: 3000,
@@ -56,14 +66,23 @@ export const ProveedorCarrito = ({ children }) => {
   };
 
   const subtotal = carrito.reduce(
-    (sum, item) => sum + item.precio * item.cantidad,
+    (sum, item) => sum + Number(item.precio || 0) * Number(item.cantidad || 1),
     0,
   );
-  const descuentoTotal = carrito.reduce(
-    (sum, item) => sum + item.precio * item.cantidad * (item.descuento / 100),
-    0,
-  );
-  const total = subtotal - descuentoTotal;
+  const ahorroTotal = carrito.reduce((sum, item) => {
+    const precioOriginal = Number(
+      item.precio_original ??
+        (item.descuento
+          ? item.precio / (1 - item.descuento / 100)
+          : item.precio || 0),
+    );
+    const precioFinal = Number(item.precio || 0);
+    return (
+      sum +
+      Math.max(0, (precioOriginal - precioFinal) * Number(item.cantidad || 1))
+    );
+  }, 0);
+  const total = subtotal;
 
   return (
     <ContextoCarrito.Provider
@@ -74,7 +93,7 @@ export const ProveedorCarrito = ({ children }) => {
         eliminarItem,
         vaciarCarrito,
         subtotal,
-        descuentoTotal,
+        ahorroTotal,
         total,
       }}
     >

@@ -19,7 +19,7 @@ const Carrito = () => {
     eliminarItem,
     vaciarCarrito,
     subtotal,
-    descuentoTotal,
+    ahorroTotal,
     total,
   } = useContext(ContextoCarrito);
 
@@ -152,10 +152,12 @@ const Carrito = () => {
                   <span>Subtotal</span>
                   <span>Bs. {subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-green-600">
-                  <span>Descuentos</span>
-                  <span>- Bs. {descuentoTotal.toFixed(2)}</span>
-                </div>
+                {ahorroTotal > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Ahorro</span>
+                    <span>- Bs. {ahorroTotal.toFixed(2)}</span>
+                  </div>
+                )}
                 <hr className="border-gray-200" />
                 <div className="flex justify-between text-gray-800 font-bold text-lg">
                   <span>Total</span>

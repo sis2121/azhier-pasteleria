@@ -9,37 +9,52 @@ const obtenerUrlImagen = (imagen) => {
 };
 
 const TarjetaProducto = ({ producto }) => {
-  const { carrito, agregarAlCarrito, actualizarItem, eliminarItem } =
+  const { carrito, agregarAlCarrito, actualizarItem } =
     useContext(ContextoCarrito);
-  const existente = carrito.find((item) => item.producto_id === producto.id);
+
+  const obtenerPrecioFinal = (presentacion) => {
+    const precioBase =
+      Number(producto.precio_porcion || 0) *
+      Number(presentacion.porciones || 0);
+    const descuento = Number(presentacion.porcentaje_descuento || 0);
+    const precioCalculado =
+      presentacion.precio_final != null
+        ? Number(presentacion.precio_final)
+        : precioBase * (1 - descuento / 100);
+    return Number(precioCalculado.toFixed(2));
+  };
+
+  const obtenerPrecioOriginal = (presentacion) => {
+    const precioBase =
+      Number(producto.precio_porcion || 0) *
+      Number(presentacion.porciones || 0);
+    return Number(precioBase.toFixed(2));
+  };
+
+  const encontrarItem = (presentacion) =>
+    carrito.find(
+      (item) =>
+        item.producto_id === producto.id &&
+        item.presentacion_id === presentacion.id,
+    );
 
   const manejarAgregar = (presentacion) => {
-    if (existente) {
-      if (existente.presentacion_id === presentacion.id) {
-        actualizarItem(existente.idCarrito, existente.cantidad + 1);
-      } else {
-        eliminarItem(existente.idCarrito);
-        agregarAlCarrito({
-          producto_id: producto.id,
-          nombre: producto.nombre,
-          presentacion_id: presentacion.id,
-          porciones: presentacion.porciones,
-          precio: presentacion.precio_final,
-          descuento: presentacion.porcentaje_descuento,
-          cantidad: 1,
-        });
-      }
-    } else {
-      agregarAlCarrito({
-        producto_id: producto.id,
-        nombre: producto.nombre,
-        presentacion_id: presentacion.id,
-        porciones: presentacion.porciones,
-        precio: presentacion.precio_final,
-        descuento: presentacion.porcentaje_descuento,
-        cantidad: 1,
-      });
+    const itemExistente = encontrarItem(presentacion);
+    if (itemExistente) {
+      actualizarItem(itemExistente.idCarrito, itemExistente.cantidad + 1);
+      return;
     }
+
+    agregarAlCarrito({
+      producto_id: producto.id,
+      nombre: producto.nombre,
+      presentacion_id: presentacion.id,
+      porciones: presentacion.porciones,
+      precio: obtenerPrecioFinal(presentacion),
+      precio_original: obtenerPrecioOriginal(presentacion),
+      descuento: Number(presentacion.porcentaje_descuento || 0),
+      cantidad: 1,
+    });
   };
 
   return (
@@ -77,46 +92,43 @@ const TarjetaProducto = ({ producto }) => {
 
           {/* Presentaciones */}
           <div className="space-y-1.5">
-            {producto.presentaciones?.map((pres) => (
-              <div
-                key={pres.id}
-                className="flex items-center justify-between bg-gray-50 p-2 rounded-lg text-sm"
-              >
-                <div>
-                  <span className="font-medium text-gray-700">
-                    {pres.porciones} porc.
-                  </span>
-                  <span className="text-gray-400 mx-1">•</span>
-                  <span className="text-green-600 text-xs">
-                    {pres.porcentaje_descuento}% OFF
-                  </span>
+            {producto.presentaciones?.map((pres) => {
+              const itemActual = encontrarItem(pres);
+              return (
+                <div
+                  key={pres.id}
+                  className="flex items-center justify-between bg-gray-50 p-2 rounded-lg text-sm"
+                >
+                  <div>
+                    <span className="font-medium text-gray-700">
+                      {pres.porciones} porc.
+                    </span>
+                    <span className="text-gray-400 mx-1">•</span>
+                    <span className="text-green-600 text-xs">
+                      {pres.porcentaje_descuento}% OFF
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-800">
+                      Bs. {obtenerPrecioFinal(pres)}
+                    </span>
+                    <button
+                      onClick={() => manejarAgregar(pres)}
+                      className="p-1.5 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors"
+                      title={
+                        itemActual
+                          ? "Agregar otra unidad"
+                          : "Agregar al carrito"
+                      }
+                    >
+                      {itemActual ? <Plus size={14} /> : <Plus size={14} />}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-800">
-                    Bs. {pres.precio_final}
-                  </span>
-                  <button
-                    onClick={() => manejarAgregar(pres)}
-                    className="p-1.5 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors"
-                    title={
-                      existente ? "Editar en carrito" : "Agregar al carrito"
-                    }
-                  >
-                    {existente ? <Edit size={14} /> : <Plus size={14} />}
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
-
-        {/* Indicador de ya en carrito */}
-        {existente && (
-          <div className="mt-3 flex items-center gap-1 text-xs text-pink-600 bg-pink-50 px-2 py-1 rounded-full">
-            <ShoppingBag size={12} />
-            En carrito ({existente.cantidad})
-          </div>
-        )}
       </div>
     </div>
   );
