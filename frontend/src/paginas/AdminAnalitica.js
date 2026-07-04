@@ -1,21 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { apiAdmin } from "../servicios/api";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 
-const GraficoGrafoEstatico = ({ grafo }) => {
+const GraficoGrafoEstatico = ({ grafo, nodoResaltadoId = null }) => {
   const nodos = grafo?.nodos ?? [];
   const aristas = grafo?.aristas ?? [];
-  const productos = nodos.filter((n) => n.tipo === "producto");
-  const clientes = nodos.filter((n) => n.tipo === "cliente");
+
+  const nodosFiltrados = nodoResaltadoId
+    ? nodos.filter((nodo) => {
+        if (nodo.id === nodoResaltadoId) return true;
+        return aristas.some(
+          (arista) =>
+            (arista.origen === nodoResaltadoId && arista.destino === nodo.id) ||
+            (arista.destino === nodoResaltadoId && arista.origen === nodo.id),
+        );
+      })
+    : nodos;
+
+  const aristasFiltradas = nodoResaltadoId
+    ? aristas.filter(
+        (arista) =>
+          arista.origen === nodoResaltadoId ||
+          arista.destino === nodoResaltadoId,
+      )
+    : aristas;
+
+  const productos = nodosFiltrados.filter((n) => n.tipo === "producto");
+  const clientes = nodosFiltrados.filter((n) => n.tipo === "cliente");
   const altura = Math.max(
     360,
     90 + Math.max(productos.length, clientes.length) * 44,
@@ -83,7 +93,7 @@ const GraficoGrafoEstatico = ({ grafo }) => {
           Clientes
         </text>
 
-        {aristas.map((arista) => {
+        {aristasFiltradas.map((arista) => {
           const origen = posiciones[arista.origen];
           const destino = posiciones[arista.destino];
           if (!origen || !destino) return null;
@@ -102,17 +112,24 @@ const GraficoGrafoEstatico = ({ grafo }) => {
           );
         })}
 
-        {nodos.map((nodo) => {
+        {nodosFiltrados.map((nodo) => {
           const posicion = posiciones[nodo.id];
           if (!posicion) return null;
+          const esResaltado = nodo.id === nodoResaltadoId;
 
           return (
             <g key={nodo.id}>
               <circle
                 cx={posicion.x}
                 cy={posicion.y}
-                r="22"
-                fill={nodo.tipo === "cliente" ? "#2563eb" : "#ec4899"}
+                r={esResaltado ? "26" : "22"}
+                fill={
+                  esResaltado
+                    ? "#be185d"
+                    : nodo.tipo === "cliente"
+                      ? "#2563eb"
+                      : "#ec4899"
+                }
                 stroke="#ffffff"
                 strokeWidth="3"
               />
@@ -152,93 +169,62 @@ const AdminAnalitica = () => {
 
   if (!datos) return <p className="p-6 text-gray-500">Cargando analítica...</p>;
 
-  const datosBarras = [...(datos.menos_vendidos || [])].sort(
-    (a, b) => a.cantidad - b.cantidad,
-  );
+  const productoMasConectado = (() => {
+    const conteo = {};
+    (datos.grafo_bipartito?.nodos ?? []).forEach((nodo) => {
+      if (nodo.tipo === "producto") {
+        conteo[nodo.id] = 0;
+      }
+    });
+
+    (datos.grafo_bipartito?.aristas ?? []).forEach((arista) => {
+      if (conteo[arista.origen] !== undefined) {
+        conteo[arista.origen] += 1;
+      }
+      if (conteo[arista.destino] !== undefined) {
+        conteo[arista.destino] += 1;
+      }
+    });
+
+    let mejor = null;
+    Object.entries(conteo).forEach(([id, valor]) => {
+      if (!mejor || valor > mejor.valor) {
+        mejor = { id, valor };
+      }
+    });
+
+    return mejor
+      ? (datos.grafo_bipartito?.nodos ?? []).find(
+          (nodo) => nodo.id === mejor.id,
+        )
+      : null;
+  })();
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Analítica de Negocio</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-xl shadow-sm border">
-          <h3 className="font-semibold text-lg mb-3">Clientes frecuentes</h3>
-          <ul className="space-y-2">
-            {datos.clientes_frecuentes.map((c) => (
-              <li key={c.telefono} className="flex justify-between text-sm">
-                <span className="text-gray-700">{c.telefono}</span>
-                <span className="font-medium">{c.pedidos} pedidos</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="bg-white p-5 rounded-xl shadow-sm border">
-          <h3 className="font-semibold text-lg mb-3">Clientes de alto valor</h3>
-          <ul className="space-y-2">
-            {datos.clientes_alto_valor.map((c) => (
-              <li key={c.telefono} className="flex justify-between text-sm">
-                <span className="text-gray-700">{c.telefono}</span>
-                <span className="font-medium">Bs. {c.total_gastado}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
       <div className="bg-white p-5 rounded-xl shadow-sm border">
         <h3 className="font-semibold text-lg mb-3">
-          Productos con menor demanda
+          Relación completa cliente ↔ producto
         </h3>
         <p className="text-sm text-gray-500 mb-3">
-          Comparación simple de unidades vendidas por producto.
-        </p>
-        <div className="h-60">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={datosBarras}
-              layout="vertical"
-              margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#f0f0f0"
-                horizontal={false}
-              />
-              <XAxis
-                type="number"
-                tick={{ fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                dataKey="nombre"
-                tick={{ fontSize: 12 }}
-                width={120}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip />
-              <Bar dataKey="cantidad" radius={[0, 8, 8, 0]} barSize={22}>
-                {datosBarras.map((entrada, index) => (
-                  <Cell
-                    key={`${entrada.nombre}-${index}`}
-                    fill={index % 2 === 0 ? "#ef4444" : "#f97316"}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="bg-white p-5 rounded-xl shadow-sm border">
-        <h3 className="font-semibold text-lg mb-3">
-          Relación cliente ↔ producto
-        </h3>
-        <p className="text-sm text-gray-500 mb-3">
-          Vista estática de las conexiones entre clientes y productos comprados.
+          Vista estática de todas las conexiones entre clientes y productos.
         </p>
         <GraficoGrafoEstatico grafo={datos.grafo_bipartito} />
+      </div>
+
+      <div className="bg-white p-5 rounded-xl shadow-sm border">
+        <h3 className="font-semibold text-lg mb-3">Producto más comprado</h3>
+        <p className="text-sm text-gray-500 mb-3">
+          {productoMasConectado
+            ? `Nodo destacado: ${productoMasConectado.etiqueta}`
+            : "No hay suficiente información para resaltar un producto."}
+        </p>
+        <GraficoGrafoEstatico
+          grafo={datos.grafo_bipartito}
+          nodoResaltadoId={productoMasConectado?.id}
+        />
       </div>
     </div>
   );
