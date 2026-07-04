@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from sqlalchemy import inspect, text
 from config import Config
-from modelos import db, Administrador
+from modelos import db, Administrador, Producto
 import cloudinary
 import os
 
@@ -39,24 +39,15 @@ with app.app_context():
         inspector = inspect(db.engine)
         tablas = set(inspector.get_table_names())
 
-        if 'categorias' in tablas:
-            with db.engine.begin() as conn:
-                conn.execute(text('DROP TABLE IF EXISTS categorias CASCADE'))
-
         if 'productos' in tablas:
-            columnas = {col['name'] for col in inspector.get_columns('productos')}
-            if 'categoria_id' in columnas:
+            columnas_esperadas = set(Producto.__table__.columns.keys())
+            columnas_actuales = {col['name'] for col in inspector.get_columns('productos')}
+            columnas_extra = columnas_actuales - columnas_esperadas
+
+            if columnas_extra:
                 with db.engine.begin() as conn:
-                    conn.execute(text('ALTER TABLE productos DROP COLUMN IF EXISTS categoria_id'))
-
-        if 'productos' in tablas:
-            with db.engine.begin() as conn:
-                columnas_restantes = conn.execute(
-                    text("SELECT column_name FROM information_schema.columns WHERE table_name = 'productos'")
-                ).fetchall()
-                columnas_restantes = {col[0] for col in columnas_restantes}
-                if 'categoria_id' in columnas_restantes:
-                    raise RuntimeError('La columna categoria_id sigue presente en productos tras la migración.')
+                    for nombre_columna in sorted(columnas_extra):
+                        conn.execute(text(f'ALTER TABLE productos DROP COLUMN IF EXISTS {nombre_columna}'))
 
     migrar_esquema()
     db.create_all()

@@ -89,12 +89,7 @@ const AdminPanel = () => {
                 horizontal={false}
               />
               <XAxis type="number" tick={{ fontSize: 12 }} />
-              <YAxis
-                dataKey="nombre"
-                type="category"
-                tick={{ fontSize: 13 }}
-                width={100}
-              />
+              <YAxis dataKey="nombre" tick={{ fontSize: 13 }} width={100} />
               <Tooltip cursor={{ fill: "#fdf2f8" }} />
               <Bar dataKey="cantidad" radius={[0, 8, 8, 0]} barSize={20}>
                 {datos.mas_vendidos.map((entry, index) => (

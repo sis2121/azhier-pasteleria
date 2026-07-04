@@ -72,12 +72,7 @@ const AdminAnalitica = () => {
                 horizontal={false}
               />
               <XAxis type="number" tick={{ fontSize: 12 }} />
-              <YAxis
-                dataKey="nombre"
-                type="category"
-                tick={{ fontSize: 12 }}
-                width={100}
-              />
+              <YAxis dataKey="nombre" tick={{ fontSize: 12 }} width={100} />
               <Tooltip />
               <Bar
                 dataKey="cantidad"
