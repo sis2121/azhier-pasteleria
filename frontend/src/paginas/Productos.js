@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiPublica } from "../servicios/api";
 import TarjetaProducto from "../componentes/TarjetaProducto";
-import { Search, Package } from "lucide-react";
+import { Search, Package, ShoppingCart } from "lucide-react";
 
 const Productos = () => {
+  const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
 
@@ -39,19 +41,29 @@ const Productos = () => {
             Todos nuestros productos en un solo listado.
           </div>
 
-          {/* Búsqueda */}
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Buscar producto..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-full border border-gray-200 bg-white text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-shadow"
-            />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button
+              onClick={() => navigate("/carrito")}
+              className="flex items-center justify-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-4 py-2 text-sm font-medium text-pink-700 transition hover:bg-pink-100"
+            >
+              <ShoppingCart size={16} />
+              Ver carrito
+            </button>
+
+            {/* Búsqueda */}
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Buscar producto..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                className="pl-10 pr-4 py-2 rounded-full border border-gray-200 bg-white text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-shadow"
+              />
+            </div>
           </div>
         </div>
 

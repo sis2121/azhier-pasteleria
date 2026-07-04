@@ -1,17 +1,8 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Cake,
-  ShoppingCart,
-  Menu,
-  X,
-  Home,
-  Package,
-  Shield,
-} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Cake, Menu, X, Home, Package, Shield } from "lucide-react";
 
 const BarraNav = () => {
-  const navegar = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   const enlaces = [
@@ -45,15 +36,6 @@ const BarraNav = () => {
                 <span>{enlace.nombre}</span>
               </Link>
             ))}
-
-            {/* Carrito con badge */}
-            <button
-              onClick={() => navegar("/carrito")}
-              className="relative flex items-center gap-2 px-4 py-2 rounded-full text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all ml-2"
-            >
-              <ShoppingCart size={18} />
-              <span>Carrito</span>
-            </button>
           </div>
 
           {/* Botón hamburguesa (móvil) */}
@@ -80,16 +62,6 @@ const BarraNav = () => {
                   <span>{enlace.nombre}</span>
                 </Link>
               ))}
-              <button
-                onClick={() => {
-                  navegar("/carrito");
-                  setMenuAbierto(false);
-                }}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
-              >
-                <ShoppingCart size={20} />
-                <span>Carrito</span>
-              </button>
             </div>
           </div>
         )}
