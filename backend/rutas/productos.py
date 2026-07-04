@@ -90,11 +90,26 @@ def actualizar_producto(id):
 
     presentaciones_json = request.form.get('presentaciones')
     if presentaciones_json is not None:
-        # Eliminar las existentes
-        Presentacion.query.filter_by(producto_id=producto.id).delete()
         presentaciones = json.loads(presentaciones_json)
+
+        presentaciones_existentes = Presentacion.query.filter_by(producto_id=producto.id).all()
+        ids_existentes = {pr.id for pr in presentaciones_existentes}
+
+        for pr in presentaciones_existentes:
+            if pr.id not in {int(p.get('id')) for p in presentaciones if p.get('id')}:
+                ItemPedido.query.filter_by(presentacion_id=pr.id).delete(synchronize_session=False)
+                db.session.delete(pr)
+
         for pres in presentaciones:
             precio_final = float(producto.precio_porcion) * int(pres['porciones']) * (1 - float(pres.get('porcentaje_descuento', 0))/100)
+            if pres.get('id'):
+                presentacion_existente = Presentacion.query.get(pres['id'])
+                if presentacion_existente and presentacion_existente.producto_id == producto.id:
+                    presentacion_existente.porciones = int(pres['porciones'])
+                    presentacion_existente.porcentaje_descuento = float(pres.get('porcentaje_descuento', 0))
+                    presentacion_existente.precio_final = precio_final
+                    continue
+
             pp = Presentacion(
                 producto_id=producto.id,
                 porciones=int(pres['porciones']),
