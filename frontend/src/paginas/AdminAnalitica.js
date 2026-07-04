@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 
 const GraficoGrafoEstatico = ({ grafo }) => {
@@ -126,11 +127,12 @@ const GraficoGrafoEstatico = ({ grafo }) => {
                 {nodo.etiqueta.slice(0, 2).toUpperCase()}
               </text>
               <text
-                x={posicion.x + 32}
+                x={nodo.tipo === "producto" ? posicion.x - 34 : posicion.x + 32}
                 y={posicion.y - 8}
                 fill="#111827"
                 fontSize="11"
                 fontWeight="600"
+                textAnchor={nodo.tipo === "producto" ? "end" : "start"}
               >
                 {nodo.etiqueta}
               </text>
@@ -216,12 +218,14 @@ const AdminAnalitica = () => {
                 tickLine={false}
               />
               <Tooltip />
-              <Bar
-                dataKey="cantidad"
-                fill="#ef4444"
-                radius={[0, 8, 8, 0]}
-                barSize={20}
-              />
+              <Bar dataKey="cantidad" radius={[0, 8, 8, 0]} barSize={22}>
+                {datosBarras.map((entrada, index) => (
+                  <Cell
+                    key={`${entrada.nombre}-${index}`}
+                    fill={index % 2 === 0 ? "#ef4444" : "#f97316"}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
