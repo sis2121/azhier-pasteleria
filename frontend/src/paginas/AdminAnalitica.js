@@ -9,7 +9,129 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import ForceGraph2D from "react-force-graph-2d";
+
+const GraficoGrafoEstatico = ({ grafo }) => {
+  const nodos = grafo?.nodos ?? [];
+  const aristas = grafo?.aristas ?? [];
+  const productos = nodos.filter((n) => n.tipo === "producto");
+  const clientes = nodos.filter((n) => n.tipo === "cliente");
+  const altura = Math.max(
+    360,
+    90 + Math.max(productos.length, clientes.length) * 44,
+  );
+
+  const posiciones = {};
+  const calcularY = (index, total) => {
+    if (total <= 1) return altura / 2;
+    const margen = 70;
+    const espacio = altura - margen * 2;
+    return margen + (index * espacio) / (total - 1);
+  };
+
+  productos.forEach((nodo, index) => {
+    posiciones[nodo.id] = { x: 140, y: calcularY(index, productos.length) };
+  });
+
+  clientes.forEach((nodo, index) => {
+    posiciones[nodo.id] = { x: 620, y: calcularY(index, clientes.length) };
+  });
+
+  return (
+    <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-2">
+      <svg
+        viewBox={`0 0 760 ${altura}`}
+        className="w-full h-full min-h-[360px]"
+      >
+        <rect x="0" y="0" width="760" height={altura} rx="16" fill="#faf7f7" />
+        <line
+          x1="140"
+          y1="30"
+          x2="140"
+          y2={altura - 30}
+          stroke="#f2c8d8"
+          strokeWidth="2"
+          strokeDasharray="6 4"
+        />
+        <line
+          x1="620"
+          y1="30"
+          x2="620"
+          y2={altura - 30}
+          stroke="#f2c8d8"
+          strokeWidth="2"
+          strokeDasharray="6 4"
+        />
+        <text
+          x="140"
+          y="24"
+          textAnchor="middle"
+          fill="#be185d"
+          fontSize="13"
+          fontWeight="700"
+        >
+          Productos
+        </text>
+        <text
+          x="620"
+          y="24"
+          textAnchor="middle"
+          fill="#2563eb"
+          fontSize="13"
+          fontWeight="700"
+        >
+          Clientes
+        </text>
+
+        {aristas.map((arista) => {
+          const origen = posiciones[arista.origen];
+          const destino = posiciones[arista.destino];
+          if (!origen || !destino) return null;
+
+          return (
+            <line
+              key={`${arista.origen}-${arista.destino}`}
+              x1={origen.x}
+              y1={origen.y}
+              x2={destino.x}
+              y2={destino.y}
+              stroke="#d1d5db"
+              strokeWidth={Math.max(1.2, arista.peso * 0.6)}
+              strokeOpacity="0.7"
+            />
+          );
+        })}
+
+        {nodos.map((nodo) => {
+          const posicion = posiciones[nodo.id];
+          if (!posicion) return null;
+
+          return (
+            <g key={nodo.id}>
+              <circle
+                cx={posicion.x}
+                cy={posicion.y}
+                r="20"
+                fill={nodo.tipo === "cliente" ? "#3b82f6" : "#ec4899"}
+                stroke="#ffffff"
+                strokeWidth="3"
+              />
+              <text
+                x={posicion.x}
+                y={posicion.y + 4}
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="10"
+                fontWeight="700"
+              >
+                {nodo.etiqueta.slice(0, 2).toUpperCase()}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+};
 
 const AdminAnalitica = () => {
   const [datos, setDatos] = useState(null);
@@ -19,18 +141,9 @@ const AdminAnalitica = () => {
 
   if (!datos) return <p className="p-6 text-gray-500">Cargando analítica...</p>;
 
-  const datosGrafo = {
-    nodes: datos.grafo_bipartito.nodos.map((n) => ({
-      id: n.id,
-      group: n.tipo,
-      etiqueta: n.etiqueta,
-    })),
-    links: datos.grafo_bipartito.aristas.map((e) => ({
-      source: e.origen,
-      target: e.destino,
-      value: e.peso,
-    })),
-  };
+  const datosBarras = [...(datos.menos_vendidos || [])].sort(
+    (a, b) => a.cantidad - b.cantidad,
+  );
 
   return (
     <div className="space-y-6">
@@ -62,22 +175,42 @@ const AdminAnalitica = () => {
       </div>
 
       <div className="bg-white p-5 rounded-xl shadow-sm border">
-        <h3 className="font-semibold text-lg mb-3">Productos menos vendidos</h3>
-        <div className="h-48">
+        <h3 className="font-semibold text-lg mb-3">
+          Productos con menor demanda
+        </h3>
+        <p className="text-sm text-gray-500 mb-3">
+          Comparación simple de unidades vendidas por producto.
+        </p>
+        <div className="h-60">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={datos.menos_vendidos} layout="vertical">
+            <BarChart
+              data={datosBarras}
+              layout="vertical"
+              margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+            >
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="#f0f0f0"
                 horizontal={false}
               />
-              <XAxis type="number" tick={{ fontSize: 12 }} />
-              <YAxis dataKey="nombre" tick={{ fontSize: 12 }} width={100} />
+              <XAxis
+                type="number"
+                tick={{ fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                dataKey="nombre"
+                tick={{ fontSize: 12 }}
+                width={120}
+                axisLine={false}
+                tickLine={false}
+              />
               <Tooltip />
               <Bar
                 dataKey="cantidad"
-                fill="#f97316"
-                radius={[0, 4, 4, 0]}
+                fill="#f43f5e"
+                radius={[0, 6, 6, 0]}
                 barSize={18}
               />
             </BarChart>
@@ -86,29 +219,13 @@ const AdminAnalitica = () => {
       </div>
 
       <div className="bg-white p-5 rounded-xl shadow-sm border">
-        <h3 className="font-semibold text-lg mb-3">Grafo Cliente ↔ Producto</h3>
-        <p className="text-sm text-gray-500 mb-2">
-          Conexiones entre clientes y productos comprados. Pasa el cursor sobre
-          un nodo.
+        <h3 className="font-semibold text-lg mb-3">
+          Relación cliente ↔ producto
+        </h3>
+        <p className="text-sm text-gray-500 mb-3">
+          Vista estática de las conexiones entre clientes y productos comprados.
         </p>
-        <div style={{ height: 450 }} className="border rounded bg-gray-50">
-          <ForceGraph2D
-            graphData={datosGrafo}
-            nodeLabel="etiqueta"
-            nodeAutoColorBy="group"
-            linkWidth={(link) => link.value}
-            linkDirectionalArrowLength={3}
-            nodeCanvasObject={(node, ctx, globalScale) => {
-              const label = node.etiqueta;
-              const fontSize = 12 / globalScale;
-              ctx.font = `${fontSize}px Sans-Serif`;
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-              ctx.fillStyle = node.group === "cliente" ? "#3b82f6" : "#ec4899";
-              ctx.fillText(label, node.x, node.y);
-            }}
-          />
-        </div>
+        <GraficoGrafoEstatico grafo={datos.grafo_bipartito} />
       </div>
     </div>
   );

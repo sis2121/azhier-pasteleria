@@ -164,7 +164,7 @@ const FinalizarPedido = () => {
                   <MapContainer
                     center={[-14.83, -64.9]}
                     zoom={13}
-                    style={{ height: "250px", width: "100%" }}
+                    style={{ height: "320px", width: "100%" }}
                   >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     <SelectorUbicacion alSeleccionar={setUbicacion} />
