@@ -27,32 +27,44 @@ export const ProveedorCarrito = ({ children }) => {
     };
     setCarrito((prev) => [...prev, nuevoItem]);
     toast.success(`${item.nombre} agregado al carrito`, {
-      duration: 3000,
+      duration: 2500,
+      id: `agregar-${nuevoItem.idCarrito}`,
     });
   };
 
   const actualizarItem = (idCarrito, cantidad) => {
-    if (cantidad <= 0) {
-      setCarrito((prev) => {
-        const item = prev.find((i) => i.idCarrito === idCarrito);
-        if (item)
-          toast.error(`${item.nombre} eliminado del carrito`, {
-            duration: 3000,
-          });
+    setCarrito((prev) => {
+      const item = prev.find((i) => i.idCarrito === idCarrito);
+      if (!item) return prev;
+
+      if (cantidad <= 0) {
+        toast.error(`${item.nombre} eliminado del carrito`, {
+          duration: 2500,
+          id: `eliminar-${idCarrito}`,
+        });
         return prev.filter((i) => i.idCarrito !== idCarrito);
-      });
-    } else {
-      setCarrito((prev) =>
-        prev.map((i) => (i.idCarrito === idCarrito ? { ...i, cantidad } : i)),
+      }
+
+      const actualizado = prev.map((i) =>
+        i.idCarrito === idCarrito ? { ...i, cantidad } : i,
       );
-    }
+      toast.success(`${item.nombre} actualizado en el carrito`, {
+        duration: 2000,
+        id: `actualizar-${idCarrito}`,
+      });
+      return actualizado;
+    });
   };
 
   const eliminarItem = (idCarrito) => {
     setCarrito((prev) => {
       const item = prev.find((i) => i.idCarrito === idCarrito);
-      if (item)
-        toast.error(`${item.nombre} eliminado del carrito`, { duration: 3000 });
+      if (item) {
+        toast.error(`${item.nombre} eliminado del carrito`, {
+          duration: 2500,
+          id: `eliminar-${idCarrito}`,
+        });
+      }
       return prev.filter((i) => i.idCarrito !== idCarrito);
     });
   };

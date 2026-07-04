@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ContextoCarrito } from "./ContextoCarrito";
-import { Plus, Edit, ShoppingBag, Percent } from "lucide-react";
+import { Plus, ShoppingBag, Percent, Check } from "lucide-react";
 
 const obtenerUrlImagen = (imagen) => {
   if (!imagen) return "/placeholder.jpg";
@@ -114,14 +114,19 @@ const TarjetaProducto = ({ producto }) => {
                     </span>
                     <button
                       onClick={() => manejarAgregar(pres)}
-                      className="p-1.5 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors"
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${
+                        itemActual
+                          ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                          : "bg-pink-500 text-white hover:bg-pink-600"
+                      }`}
                       title={
                         itemActual
-                          ? "Agregar otra unidad"
-                          : "Agregar al carrito"
+                          ? `Agregar otra unidad de ${producto.nombre}`
+                          : `Agregar ${producto.nombre} (${pres.porciones} porc.) al carrito`
                       }
                     >
-                      {itemActual ? <Plus size={14} /> : <Plus size={14} />}
+                      {itemActual ? <Check size={14} /> : <Plus size={14} />}
+                      <span>{itemActual ? "Añadir otra" : "Agregar"}</span>
                     </button>
                   </div>
                 </div>
