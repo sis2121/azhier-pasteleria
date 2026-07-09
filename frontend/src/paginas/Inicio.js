@@ -27,13 +27,9 @@ const Inicio = () => {
         className="relative text-white overflow-hidden bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/fondo.png')" }}
       >
-        {/* Capa oscura para legibilidad */}
         <div className="absolute inset-0 bg-black/40" />
-
-        {/* Círculos decorativos */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
-
         <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 text-sm">
@@ -147,12 +143,14 @@ const Inicio = () => {
               </div>
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  {/* Logo reemplazando al ícono de pastel */}
-                  <img
-                    src="/images/logopastel.png"
-                    alt="Logo"
-                    className="h-4 w-4 object-contain"
-                  />
+                  {/* Logo con fondo rosa para visibilidad */}
+                  <div className="p-1 bg-pink-100 rounded-lg flex items-center justify-center">
+                    <img
+                      src="/images/logopastel.png"
+                      alt="Logo"
+                      className="h-5 w-5 object-contain"
+                    />
+                  </div>
                   <h3 className="font-semibold text-gray-800">{p.nombre}</h3>
                 </div>
                 <p className="text-sm text-gray-500 mb-4 line-clamp-2">
@@ -197,7 +195,6 @@ const Inicio = () => {
                 repostería.
               </p>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="bg-white rounded-2xl p-6 shadow-sm border">
                 <div className="flex items-center gap-3 mb-4">
@@ -212,7 +209,6 @@ const Inicio = () => {
                   Trinidad, Beni, Bolivia
                 </p>
               </div>
-
               <div className="bg-white rounded-2xl p-6 shadow-sm border">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-pink-100 rounded-lg">
@@ -226,7 +222,6 @@ const Inicio = () => {
                   +591 69399722
                 </p>
               </div>
-
               <div className="bg-white rounded-2xl p-6 shadow-sm border md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-pink-100 rounded-lg">
