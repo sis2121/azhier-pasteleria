@@ -23,7 +23,7 @@ const BarraNav = () => {
             <img
               src="/images/logopastel.png"
               alt="Azhier Pastelería"
-              className="h-10 w-10 object-contain"
+              className="h-14 w-14 object-contain"
             />
             <span>AZHIER</span>
           </Link>
