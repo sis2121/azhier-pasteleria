@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { apiPublica } from "../servicios/api";
 import { Link } from "react-router-dom";
 import {
-  Cake,
   Star,
   Clock,
   MapPin,
@@ -23,15 +22,15 @@ const Inicio = () => {
 
   return (
     <div>
-      {/* Hero Section - MODIFICADO CON IMAGEN DE FONDO */}
+      {/* Hero Section - CON IMAGEN DE FONDO */}
       <section
         className="relative text-white overflow-hidden bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/fondo.png')" }}
       >
-        {/* Capa oscura encima de la imagen para que el texto sea legible */}
+        {/* Capa oscura para legibilidad */}
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Estos son los círculos decorativos de brillo (los mantuve) */}
+        {/* Círculos decorativos */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
 
@@ -148,7 +147,12 @@ const Inicio = () => {
               </div>
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Cake size={16} className="text-pink-500" />
+                  {/* Logo reemplazando al ícono de pastel */}
+                  <img
+                    src="/images/logopastel.png"
+                    alt="Logo"
+                    className="h-4 w-4 object-contain"
+                  />
                   <h3 className="font-semibold text-gray-800">{p.nombre}</h3>
                 </div>
                 <p className="text-sm text-gray-500 mb-4 line-clamp-2">
