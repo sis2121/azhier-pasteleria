@@ -23,9 +23,15 @@ const Inicio = () => {
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-pink-500 via-pink-400 to-rose-400 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20" />
+      {/* Hero Section - MODIFICADO CON IMAGEN DE FONDO */}
+      <section
+        className="relative text-white overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/fondo.png')" }}
+      >
+        {/* Capa oscura encima de la imagen para que el texto sea legible */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Estos son los círculos decorativos de brillo (los mantuve) */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
 
