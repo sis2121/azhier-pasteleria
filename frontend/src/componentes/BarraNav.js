@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Cake, Menu, X, Home, Package, Shield } from "lucide-react";
+import { Menu, X, Home, Package, Shield } from "lucide-react";
 
 const BarraNav = () => {
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -20,7 +20,11 @@ const BarraNav = () => {
             to="/"
             className="flex items-center gap-2 text-pink-800 font-bold text-xl hover:text-pink-600 transition-colors"
           >
-            <Cake size={28} />
+            <img
+              src="/images/logopastel.png"
+              alt="Azhier Pastelería"
+              className="h-7 w-7 object-contain"
+            />
             <span>AZHIER</span>
           </Link>
 
